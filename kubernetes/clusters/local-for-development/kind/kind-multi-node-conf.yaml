@@ -1,0 +1,25 @@
+# multi node cluster with 1master and two workers with limited resources + ephemeral container turned on
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+#featureGates:
+#  EphemeralContainers: true
+nodes:
+# 1 control plane node and 2 workers
+# the control plane node config
+- role: control-plane
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        eviction-soft: memory.available<100Mi
+        system-reserved: memory=200Mi
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        eviction-soft: memory.available<100Mi
+        system-reserved: memory=200Mi
