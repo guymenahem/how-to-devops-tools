@@ -1,0 +1,5 @@
+# single node cluster with ephemeral container turned on
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+featureGates:
+  EphemeralContainers: true
