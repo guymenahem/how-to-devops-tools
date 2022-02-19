@@ -2,6 +2,9 @@
 
 kind is a tool for running local Kubernetes clusters using Docker container “nodes”
 
+## Prerequisites
+- Docker
+
 ## How to create a cluster?
 
 ### 1. Install kind
