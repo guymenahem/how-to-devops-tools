@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ready-live
+spec:
+  selector:
+    matchLabels:
+      project: ready-live
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        project: ready-live
+    spec:
+      containers:
+      - env:
+        image: ready-live-test:0.0.3
+        imagePullPolicy: IfNotPresent
+        name: ready-live-test
+        ports:
+        - containerPort: 8080
+          name: https
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 3
+          timeoutSeconds: 3
+        livenessProbe:
+          failureThreshold: 60
+          httpGet:
+            path: /live
+            port: 8080
+          initialDelaySeconds: 0
+          periodSeconds: 1
+          timeoutSeconds: 1
