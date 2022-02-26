@@ -1,22 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ready-live
+  name: ready-live-example
 spec:
   selector:
     matchLabels:
-      project: ready-live
+      app: ready-live-example
   replicas: 1
   template:
     metadata:
       labels:
-        project: ready-live
+        app: ready-live-example
     spec:
       containers:
-      - env:
-        image: ready-live-test:0.0.3
+      - name: ready-live-test
+        image: ready-live-example:0.0.1
         imagePullPolicy: IfNotPresent
-        name: ready-live-test
         ports:
         - containerPort: 8080
           name: https
@@ -26,14 +25,19 @@ spec:
           httpGet:
             path: /ready
             port: 8080
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           periodSeconds: 3
           timeoutSeconds: 3
         livenessProbe:
-          failureThreshold: 60
+          failureThreshold: 30
           httpGet:
             path: /live
             port: 8080
           initialDelaySeconds: 0
           periodSeconds: 1
           timeoutSeconds: 1
+        env:
+          - name: FAIL_READY
+            value: "False"
+          - name: FAIL_LIVE
+            value: "False"
