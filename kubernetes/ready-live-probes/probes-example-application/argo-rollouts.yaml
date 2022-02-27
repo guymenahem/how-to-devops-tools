@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  annotations:
+    rollout.argoproj.io/revision: "3"
+  name: rollouts-demo-blue-green
+  namespace: default
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: argo-blue-green
+  strategy:
+    blueGreen:
+      activeService: argo-blue-green
+      autoPromotionEnabled: true
+      autoPromotionSeconds: 10
+      scaleDownDelaySeconds: 30
+  template:
+    metadata:
+      labels:
+        app: argo-blue-green
+    spec:
+      containers:
+      - env:
+        - name: FAIL_READY
+          value: "False"
+        - name: FAIL_LIVE
+          value: "False"
+        image: ready-live-example:0.0.1
+        livenessProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /live
+            port: 8080
+          periodSeconds: 1
+          timeoutSeconds: 1
+        name: rollouts-demo
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 3
+          timeoutSeconds: 3
+        resources:
+          requests:
+            cpu: 5m
+            memory: 32Mi
+

@@ -54,6 +54,9 @@ def start_ready():
     os.environ[readiness_env_should_fail] = "False"
     return make_response("OK", 200)
 
+@app.route('/exit/<exit_code>')
+def exit_using_code(exit_code):
+    exit(exit_code)
 
 def exit_gracefully(signalNumber, frame):
     logging.critical('Received: %s' % signalNumber)
