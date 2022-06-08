@@ -75,3 +75,8 @@ kubectl delete pod $(kubectl get pods -n default -l "app=ready-live-example" -o 
 ``` bash
 kubectl delete -f deploy.yaml
 ```
+
+## Want to monitor using Grafana?
+``` bash
+kube_deployment_status_replicas_available{deployment='ready-live-example'}
+```
