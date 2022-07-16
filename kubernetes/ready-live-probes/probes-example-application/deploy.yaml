@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ready-live-test
-        image: ready-live-example:0.0.1
+        image: thegoodguym/ready-live-example:0.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
