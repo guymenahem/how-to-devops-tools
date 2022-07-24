@@ -6,7 +6,12 @@ spec:
   selector:
     matchLabels:
       app: ready-live-example
-  replicas: 1
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -38,6 +43,6 @@ spec:
           timeoutSeconds: 1
         env:
           - name: FAIL_READY
-            value: "False"
+            value: "True"
           - name: FAIL_LIVE
             value: "False"
