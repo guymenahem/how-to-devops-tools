@@ -52,3 +52,5 @@ The default password should be `admin` but you can get it using this command:
 ``` bash
 kubectl get secrets -n cattle-system bootstrap-secret -o jsonpath='{.data.bootstrapPassword}' | base64 -d
 ```
+
+Access the dashboard - [https://127.0.0.1:8080](https://127.0.0.1:8080)
