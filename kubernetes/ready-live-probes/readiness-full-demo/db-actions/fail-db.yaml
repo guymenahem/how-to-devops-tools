@@ -1,0 +1,14 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: postgresql
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - -e
+            - |
+              exec pg_isready -U "postgres" -h 127.0.0.1 -p 6432
+              [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
