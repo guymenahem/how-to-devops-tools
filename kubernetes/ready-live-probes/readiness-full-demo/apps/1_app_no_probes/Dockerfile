@@ -1,6 +1,6 @@
 FROM python:3.9-slim-buster
 
-WORKDIR /app-no-checks
+WORKDIR /app-no-probes
 
 COPY requirements.txt requirements.txt
 
