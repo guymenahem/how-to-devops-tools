@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-app-termination-log
+spec:
+  selector:
+    matchLabels:
+      app: simple-app-termination-log
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: simple-app-termination-log
+    spec:
+      containers:
+      - name: simple-app-termination-log
+        image: ghcr.io/guymenahem/termination-log-image:0.0.1
+        terminationMessagePath: /dev/termination-log
