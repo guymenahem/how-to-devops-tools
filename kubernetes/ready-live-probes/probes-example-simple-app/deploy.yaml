@@ -25,19 +25,23 @@ spec:
           httpGet:
             path: /ready
             port: 8080
-          initialDelaySeconds: 30
+          initialDelaySeconds: 15
           periodSeconds: 3
-          timeoutSeconds: 3
+          timeoutSeconds: 5
         livenessProbe:
           failureThreshold: 30
           httpGet:
             path: /live
             port: 8080
           initialDelaySeconds: 0
-          periodSeconds: 1
-          timeoutSeconds: 1
+          periodSeconds: 3
+          timeoutSeconds: 5
         env:
           - name: FAIL_READY
             value: "False"
           - name: FAIL_LIVE
             value: "False"
+          - name: LIVE_FAIL_MSG
+            value: "Unable to retry for long time - restarting service"
+          - name: READY_FAIL_MSG
+            value: "Unable to reachout to external service"
