@@ -72,6 +72,11 @@ yarn --version
 <br>
 <br>
 
+#### MAC x86 users: Verify you got xcrun
+```bash
+xcode-select --install
+```
+
 ### Create your Backstage Application
 1. Create a Backstage application
 ```
@@ -91,7 +96,7 @@ yarn dev
 
 ### Verify your application
 1. Go to the Backstage UI (should open automatically after the `yarn dev` command)
-2. Import a component using this file - `https://github.com/backstage/backstage/blob/master/catalog-info.yaml`
+2. Import a component using this file by going into [Register an existing component](http://localhost:3000/catalog-import) and import this file- `https://github.com/backstage/backstage/blob/master/catalog-info.yaml`
 3. Review the example component
 
 <br>
@@ -107,7 +112,7 @@ yarn dev
 ```
 yarn install --frozen-lockfile
 yarn tsc
-yarn build:backend --config app-config.yaml
+yarn build:backend
 ```
 2. Build the image
 ```
@@ -117,7 +122,7 @@ docker image build . -f packages/backend/Dockerfile --tag backstage:1.0.0
 <br>
 <br>
 
-### Upload the image to your kind cluster
+### Upload the image to your registry/kind cluster
 
 This example is for Kind cluster, you can import the image to your docker repository
 
@@ -139,12 +144,16 @@ kubectl create ns backstage
 
 2. Apply the manifests in the directory from this repo `portgres-resources`. It will create the Postgres resources required with a default username-password.
 ```
-kubectl -f postgres-resources
+kubectl apply -f postgres-resources
 ```
 
 3. Verify the access to Postgres
+```bash
+export PG_POD=$(kubectl get pods -n backstage -o=jsonpath='{.items[0].metadata.name}')
 ```
-$ kubectl exec -it --namespace=backstage postgres-56c86b8bbc-66pt2 -- /bin/bash
+```bash
+> kubectl exec -it --namespace=backstage $PG_POD -- /bin/bash
+
 bash-5.1# psql -U $POSTGRES_USER
 psql (13.2)
 backstage=# \q
@@ -156,58 +165,31 @@ bash-5.1# exit
 
 ### Deploy Backstage on Kubernetes
 
-1. Use the Kubernetes instructions on the website - (link)[https://backstage.io/docs/deployment/k8s#creating-the-backstage-instance]
+1. Create the Backstage resources by preparing the files the apply them to the target cluster. You can find the instructions for it in the docs website as well - (link)[https://backstage.io/docs/deployment/k8s#creating-the-backstage-instance]
 
 
+1. Edit `backstage-resources/bs-secret.yaml` with your github api token. token must have the permissions explained (here)[https://backstage.io/docs/integrations/github/locations/#token-scopes].
 
-2. Set the Backstage application to use your Postgres DB by adding these environment variables into the backstage deployment.
-```
-          env:
-          - name: POSTGRES_PORT
-            value: "5432"
-          - name: POSTGRES_HOST
-            value: "postgres.backstage.svc.cluster.local"
+1. Apply the Backstage manifests
+``` bash
+kubectl apply -f backstage-resources
 ```
 
-3. Check your running instance by port forwarding to it
-```
+1. Check your running instance by port forwarding to it
+``` bash
 kubectl port-forward --namespace=backstage svc/backstage 8080:80
 ```
+
+1. access the (backstage app)[http://127.0.0.1:8080/]
 
 <br>
 <br>
 
 ### Deploy the Backstage Kubernetes Plugin
 1. Follow the instructions in the documentaion - (link)[https://backstage.io/docs/features/kubernetes/installation]
-2. Create a service account in your cluster
-```
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: backstage-service-account
-  namespace: backstage
-```
-3. Create the cluster role binding
-```
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: backstage-cluster-ro
-subjects:
-- namespace: backstage
-  kind: ServiceAccount
-  name: backstage-service-account
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:aggregate-to-view
-```
-4. Add the service account to the backstage deployment
-```
-    spec:
-      serviceAccountName: backstage-service-account
-```
-5. Configure the Kubernetes plugin in backstage by editing the `app-config.yaml`
+
+
+2. Configure the Kubernetes plugin in backstage by editing the `app-config.yaml`. Add this configuration to the end of the file.
 ```
 kubernetes:
  serviceLocatorMethod:
@@ -221,3 +203,24 @@ kubernetes:
          skipTLSVerify: false
          skipMetricsLookup: true
 ```
+
+3. Build the app
+```bash
+yarn build:backend
+```
+4. Build the image
+```
+docker image build . -f packages/backend/Dockerfile --tag backstage:1.0.0
+```
+5. Push the image and run the backstage deployment with the new image
+
+#### Configure your first app with Kubernetes
+
+1. Install nginx
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami;
+helm repo update;
+helm upgrade --install users-api bitnami/nginx
+```
+
+2. 
