@@ -147,12 +147,21 @@ kubectl create ns backstage
 kubectl apply -f postgres-resources
 ```
 
-3. Verify the access to Postgres
+* - If you use non-lcoa deployment, remove the section
+```bash
+  labels:
+    type: local
+...
+    storageClassName: manual
+```
+from the file `pg-vol.yaml` before applying the manifests.
+
+1. Verify the access to Postgres
 ```bash
 export PG_POD=$(kubectl get pods -n backstage -o=jsonpath='{.items[0].metadata.name}')
 ```
 ```bash
-> kubectl exec -it --namespace=backstage $PG_POD -- /bin/bash
+kubectl exec -it --namespace=backstage $PG_POD -- /bin/bash
 
 bash-5.1# psql -U $POSTGRES_USER
 psql (13.2)
@@ -216,11 +225,11 @@ docker image build . -f packages/backend/Dockerfile --tag backstage:1.0.0
 
 #### Configure your first app with Kubernetes
 
-1. Install nginx
+1. Run a sample app
 ```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami;
-helm repo update;
-helm upgrade --install users-api bitnami/nginx
+kubectl apply -f example-application
 ```
 
-2. 
+2. Add the component configuration using by [Registering an existing component](http://localhost:3000/catalog-import) and load the `example-application/user-api-component.yaml`
+
+3. Navigate to the new created app and go to the Kubernetes tab
