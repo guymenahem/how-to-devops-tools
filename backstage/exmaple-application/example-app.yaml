@@ -6,7 +6,6 @@ metadata:
   labels:
     app.kubernetes.io/name: nginx
     app.kubernetes.io/instance: users-api
-  annotations:
     backstage.io/kubernetes-id: users-api
 spec:
   replicas: 1
@@ -22,7 +21,6 @@ spec:
       labels:
         app.kubernetes.io/name: nginx
         app.kubernetes.io/instance: users-api
-      annotations:
         backstage.io/kubernetes-id: users-api
     spec:
       automountServiceAccountToken: false

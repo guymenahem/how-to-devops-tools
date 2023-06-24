@@ -2,9 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: users-api
-  description: Our users api
-  labels:
-    app.kubernetes.io/instance: users-api
+  description: Users api
   annotations:
     backstage.io/kubernetes-id: users-api
   tags:
