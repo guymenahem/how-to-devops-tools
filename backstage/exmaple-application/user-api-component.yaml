@@ -5,6 +5,8 @@ metadata:
   description: Our users api
   labels:
     app.kubernetes.io/instance: user-api
+  annotations:
+    backstage.io/kubernetes-id: users-api
   tags:
     - nginx
     - python
