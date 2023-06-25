@@ -236,11 +236,16 @@ kubectl apply -f example-application
 ...
     storageClassName: manual
 ```
-2. Upload your image to some container registry
+2. Change the pg deployment by deleting the next line:
+```bash
+subPath: postgres
+```
 
-3. Change the image in the bs-deploy.yaml to your image and apply it
+3. Upload your image to some container registry
 
-4. Create an external service
+4. Change the image in the bs-deploy.yaml to your image and apply it
+
+5. Create an external service
 ```bash
 kubectl apply -f gke-resources
 ```
