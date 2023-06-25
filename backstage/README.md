@@ -147,13 +147,6 @@ kubectl create ns backstage
 kubectl apply -f postgres-resources
 ```
 
-* - If you use non-lcoa deployment, remove the section
-```bash
-  labels:
-    type: local
-...
-    storageClassName: manual
-```
 from the file `pg-vol.yaml` before applying the manifests.
 
 1. Verify the access to Postgres
@@ -233,3 +226,21 @@ kubectl apply -f example-application
 2. Add the component configuration using by [Registering an existing component](http://localhost:3000/catalog-import) and load the `example-application/user-api-component.yaml`
 
 3. Navigate to the new created app and go to the Kubernetes tab
+
+
+### Deploy on GKE
+1. Remove the sections that create local volumes
+```bash
+  labels:
+    type: local
+...
+    storageClassName: manual
+```
+2. Upload your image to some container registry
+
+3. Change the image in the bs-deploy.yaml to your image and apply it
+
+4. Create an external service
+```bash
+kubectl apply -f gke-resources
+```
