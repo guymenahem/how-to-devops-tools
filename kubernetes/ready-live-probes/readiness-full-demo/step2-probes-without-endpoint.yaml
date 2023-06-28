@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: app-ready-example
-        image: ghcr.io/guymenahem/app-no-probes:0.0.1
+        image: ghcr.io/guymenahem/app-no-probes:0.0.2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
