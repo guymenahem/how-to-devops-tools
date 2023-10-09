@@ -24,7 +24,9 @@
 				"GitHub.vscode-pull-request-github",
 				"github.vscode-github-actions",
 				"Intility.vscode-backstage",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"ms-kubernetes-tools.kind-vscode",
+				"ms-kubernetes-tools.vscode-kubernetes-tools"
 			]
 		}
 	},
