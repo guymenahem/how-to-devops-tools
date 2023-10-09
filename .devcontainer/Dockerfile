@@ -1,7 +1,5 @@
 FROM mcr.microsoft.com/devcontainers/typescript-node:1-18-bookworm
 
-COPY --chmod=777 setup.sh  / 
-# RUN /setup.sh
 # Script copies localhost's ~/.kube/config file into the container and swaps out 
 # localhost for kubernetes.default.svc then host.docker.internal on bash/zsh start to keep them in sync.
 USER root
