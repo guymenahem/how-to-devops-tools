@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-lease-example
+  namespace: lease-demo
+spec:
+  selector:
+    matchLabels:
+      app: app-lease-example
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: app-lease-example
+    spec:
+      containers:
+      - name: app-lease-example
+        image: with-lease:0.0.1
+        imagePullPolicy: IfNotPresent
+      serviceAccountName: lease-demo-sa
