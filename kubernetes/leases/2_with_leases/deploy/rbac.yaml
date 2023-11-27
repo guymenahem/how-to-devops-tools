@@ -2,9 +2,10 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: lease-access-role
+  namespace: lease-demo
 rules:
-  - apiGroups: ["coordination.k8s.io/v1"]
-    resources: ["lease"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
     verbs: ["get", "create", "update", "list"]
 ---
 apiVersion: v1

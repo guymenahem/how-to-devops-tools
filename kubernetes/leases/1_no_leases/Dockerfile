@@ -1,13 +1,13 @@
-FROM python:3.9-slim-buster
+FROM golang:1.19
 
 WORKDIR /app
 
-RUN apt update -y && apt install -y curl && apt-get -y install libpq-dev gcc
+COPY go.mod go.sum ./
 
-COPY requirements.txt requirements.txt
+RUN go mod download
 
-RUN pip install -r ./requirements.txt
+COPY *.go ./
 
-COPY /app /app
+RUN CGO_ENABLED=0 GOOS=linux go build -o main.bin
 
-CMD [ "python3", "no_lease.py"]
+CMD ["/app/main.bin"]
