@@ -27,7 +27,7 @@ kubectl get crds | grep kyverno
 
 ## Add Your First Enforce Policy
 
-1. Add a policy to block pod creation without requests and limits
+- Add a policy to block pod creation without requests and limits
 
 ``` bash
 kubectl apply -f - <<EOF
@@ -72,7 +72,7 @@ spec:
 EOF
 ```
 
-1. Apply a deployment without requests and limits
+- Apply a deployment without requests and limits
 
 ``` bash
 kubectl apply -f - <<EOF
@@ -100,7 +100,7 @@ spec:
 EOF
 ```
 
-1. Add Requests/Limits
+- Add Requests/Limits
 
 ``` bash
 kubectl apply -f - <<EOF
@@ -135,7 +135,7 @@ spec:
 EOF
 ```
 
-1. Delete the policy and deployment
+- Delete the policy and deployment
 
 ``` bash
 kubectl delete clusterpolicy require-requests-limits;
@@ -144,7 +144,7 @@ kubectl delete deployments.apps nginx-deployment
 
 ## Let's add defaults instead of blocking the requests
 
-1. Add Mutating Policy
+- Add Mutating Policy
 
 ``` bash
 kubectl apply -f - <<EOF
@@ -199,7 +199,7 @@ spec:
 EOF
 ```
 
-1. Deploy a deployment without requests and limits
+- Deploy a deployment without requests and limits
 
 ``` bash
 kubectl apply -f - <<EOF
@@ -227,13 +227,13 @@ spec:
 EOF
 ```
 
-1. Check the deployment configuration
+- Check the deployment configuration
 
 ``` bash
 kubectl describe deployments.apps| egrep 'Requests|Limits' -A 2
 ```
 
-1. Delete everything
+- Delete everything
 
 ``` bash
 kubectl delete clusterpolicy add-default-resources;
