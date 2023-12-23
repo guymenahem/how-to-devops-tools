@@ -30,17 +30,13 @@ helm install istiod istio/istiod -n istio-system --wait
 - Install Kiali
 
 ``` bash
-helm repo add kiali https://kiali.org/helm-charts;
-helm repo update
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/kiali.yaml;
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/prometheus.yaml
+
 ```
 
-Deploy Kiali:
-
 ``` bash
-helm install \
-    --namespace istio-system \
-    kiali-server \
-    kiali/kiali-server
+kubectl rollout status deployment/kiali -n istio-system
 ```
 
 - Deploy bookinfo
@@ -68,48 +64,8 @@ do
 done
 ```
 
-Create a secret token to acces Kiali:
+Inject Faults to the ratings service:
 
 ``` bash
-kubectl create secret generic kiali-secret --from-literal=token='admin' -n istio-system
-```
-
-Patch the SA with the key:
-
-``` bash
-kubectl patch serviceaccount kiali -n istio-system -p '{"secrets": [{"name": "kiali-secret"}]}'
-```
-
-Create Cluster Role Binding:
-
-``` bash
-kubectl apply -f - << EOF
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-    name: kiali-clusterrolebinding
-subjects:
-  - kind: ServiceAccount
-    name: kiali
-    namespace: istio-system
-roleRef:
-    kind: ClusterRole
-    name: kiali
-    apiGroup: rbac.authorization.k8s.io
-EOF
-```
-
-Patch kilai deployment to use this service account
-
-``` bash
-kubectl patch deployment kiali -n istio-system --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/serviceAccountName", "value": "kiali"}]'
-```
-
-On another terminal, open kiali:
-``` bash
-kubectl get svc -n istio-system
-```
-
-``` bash
-kubectl port-forward -n istio-system svc/kiali 8080:20001
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/networking/virtual-service-ratings-test-abort.yaml
 ```
