@@ -14,91 +14,50 @@ helm repo add crossplane-stable https://charts.crossplane.io/stable
 helm repo update
 ```
 
+- Deploy Crossplane with the provider-aws
+
 ``` bash
 helm install crossplane \
+crossplane-stable/crossplane \
 --namespace crossplane-system \
---create-namespace crossplane-stable/crossplane 
+--create-namespace \
+--set provider.packages='{xpkg.upbound.io/crossplane-contrib/provider-aws:v0.39.0}'
 ```
 
-## Deploy GCP Provider
+## Cofigure AWS Provider
 
-- Deploy GCP Provider
+- Create AWS Secret & Key
+
+1 - Create access key using the following [link](https://us-east-1.console.aws.amazon.com/iam/home#/security_credentials/access-key-wizard)
+
+- Create a credentials file
 
 ``` bash
-kubectl apply -f - << EOF
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-gcp
-spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-gcp:v0.22.0
+tee aws-credentials.txt << EOF
+[default]
+aws_access_key_id = {Add your access key}
+aws_secret_access_key = {Add your secret}
 EOF
-```
-
-- Create GCP Service Account
-
-1 - [Create GCP Service account](https://console.cloud.google.com/iam-admin/serviceaccounts/create)
-2 - Pick Role as Kubernetes Engine Admin
-3 - Create the Service Account
-4 - Go to the Service Account Keys
-5 - Create a Key
-6 - Download the json file
-
-- Change the name of the json key file
-
-``` bash
-mv project-name-generated-name.json gcp-credentials.json
 ```
 
 - Create secret based on the json file
 
 ``` bash
 kubectl create secret \
-generic gcp-secret \
+generic aws-secret \
 -n crossplane-system \
---from-file=creds=./gcp-credentials.json
-```
-
-- Get your GCP project ID
-
-``` bash
-export GCP_PROJECT_ID=$(jq -r '.project_id' gcp-credentials.json)
+--from-file=creds=./aws-credentials.txt
 ```
 
 - Create Provider Config
 
 ``` bash
-kubectl apply -f - << EOF
-apiVersion: gcp.crossplane.io/v1beta1
-kind: ProviderConfig
-metadata:
-  name: default
-spec:
-  projectID: $GCP_PROJECT_ID
-  credentials:
-    source: Secret
-    secretRef:
-      namespace: crossplane-system
-      name: gcp-secret
-      key: creds
+kubectl apply -f crossplane-config
 EOF
 ```
 
-- Deploy GKE Cluster
+## Deploy resources on AWS
 
 ``` bash
-kubectl apply -f - << EOF
-apiVersion: container.gcp.crossplane.io/v1beta2
-kind: Cluster
-metadata:
-  name: crossplane-managed-cluster
-spec:
-  forProvider:
-    location: us-central1
-    autopilot:
-      enabled: true
-  writeConnectionSecretToRef:
-    name: auto-kube
-    namespace: default
-EOF
+kubectl apply -f aws-resources
 ```
