@@ -39,7 +39,7 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/ad
 kubectl rollout status deployment/kiali -n istio-system
 ```
 
-- Deploy bookinfo
+## Deploy bookinfo
 
 [Here is the bookinto app](https://istio.io/latest/docs/examples/bookinfo/)
 
@@ -63,6 +63,18 @@ do
     kubectl exec "$(kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}')" -c ratings -- curl -sS productpage:9080/productpage | grep -o "<title>.*</title>"
 done
 ```
+
+## Connect to Kiali
+
+- Open port forward
+  
+``` bash
+kubectl port-forward -n istio-system svc/kiali 8080:20001
+```
+
+- Connect to Kiali
+[Link to local Kiali](127.0.0.1:8080)
+
 
 Inject Faults to the ratings service:
 
