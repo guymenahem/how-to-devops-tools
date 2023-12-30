@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: utils
+  labels:
+    app: utils
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: utils
+  template:
+    metadata:
+      labels:
+        app: utils
+    spec:
+      containers:
+      - name: utils
+        image: arunvelsriram/utils
+        command:
+        - sleep
+        - "3600"
