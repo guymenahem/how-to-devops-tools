@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-cm
+data:
+  auth-method: "SSO"
+  sample-rate: "3"
+  max-cache: "500Mi"
