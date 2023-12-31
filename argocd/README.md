@@ -18,32 +18,39 @@ helm repo update
 
 ``` bash
 helm install argocd argo/argo-cd -n argocd --create-namespace --set configs.secret.argocdServerAdminPassword='$2a$12$npJqjPYeo8876hV6mmUL5.7/Mrly/2bBk.P3Uf8a.NGNUu6qkGbNG
-' --set configs.secret.argocdServerAdminPasswordMtime="2021-11-08T15:04:05Z"
+' --set configs.secret.argocdServerAdminPasswordMtime="2024-01-01T11:11:11Z"
 ```
-
-user: admin
-password: admin
 
 - Connect to ArgoCD UI
 
 ``` bash
-open https://127.0.0.1:8080/; kubectl port-forward svc/argocd-server -n argocd 8080:80
+open https://127.0.0.1:8080; kubectl port-forward svc/argocd-server -n argocd 8080:80
 ```
+
+user: admin
+password: admin
 
 ## Deploy Application using ArgoCD
 
 - Optional: Create a new branch
 
 ``` bash
-git checkout -b argocd
+git checkout -b argocd-demo
 ```
 
 - Adjust the yamls to your branch
 
 ``` bash
-yq --inplace '.spec.source.targetRevision = "argocd"' deploy/apps-definition/frontend-application.yaml
-yq --inplace '.spec.source.targetRevision = "argocd"' deploy/apps-definition/backend-application.yaml
-yq --inplace '.spec.source.targetRevision = "argocd"' deploy/apps-definition/auth-application.yaml
+yq --inplace '.spec.source.targetRevision = "argocd-demo"' deploy/argocd-apps.yaml
+yq --inplace '.spec.source.targetRevision = "argocd-demo"' deploy/apps-definition/frontend-application.yaml
+yq --inplace '.spec.source.targetRevision = "argocd-demo"' deploy/apps-definition/backend-application.yaml
+yq --inplace '.spec.source.targetRevision = "argocd-demo"' deploy/apps-definition/auth-application.yaml
+```
+
+``` bash
+git add deploy/app-resources;
+git commit -m "add apps" deploy;
+git push origin argocd-demo
 ```
 
 - Deploy ArgoCD App
@@ -69,7 +76,7 @@ yq --inplace '.spec.template.spec.containers[0].image = "nginx:1.24.0"' deploy/a
 ``` bash
 git add deploy/app-resources;
 git commit -m "upgrade images" deploy/app-resources;
-git push origin argocd
+git push origin argocd-demo
 ```
 
 - Review the changes in the UI
@@ -87,11 +94,10 @@ yq --inplace '.data.provider= "kubernetes"' deploy/app-resources/backend/backend
 ``` bash
 git add deploy/app-resources;
 git commit -m "add kubernetes provider" deploy/app-resources/backend/backend-cm.yaml;
-git push origin argocd
+git push origin argocd-demo
 ```
 
 - Review the changes in the UI
-
 
 ## delete the resources
 
@@ -104,6 +110,7 @@ kubectl delete -f deploy/argocd-apps.yaml
 - Delete branch
 
 ``` bash
+git push origin -d argocd-demo;
 git checkout main;
-git branch -D argocd
+git branch -D argocd-demo
 ```
