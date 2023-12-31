@@ -6,6 +6,7 @@ metadata:
 spec:
   interval: 1m0s
   path: ./fluxcd/kustomization-demo/manifests
+  targetNamespace: default
   prune: true
   sourceRef:
     kind: GitRepository

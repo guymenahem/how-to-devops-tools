@@ -29,7 +29,7 @@ git push origin fluxcd-demo
 - Add git repo source & Kustomization
 
 ``` bash
-kubectl apply -f kustomization-demo/manifests
+kubectl apply -f kustomization-demo/flux-config
 ```
 
 - Add overlay using Kustomize
@@ -57,4 +57,12 @@ git push origin fluxcd-demo
 
 ``` bash
 kubectl apply -f helm-demo/flux-config
+```
+
+## Delete Branch
+
+``` bash
+git push origin -d fluxcd-demo;
+git checkout main;
+git branch -D fluxcd-demo
 ```
