@@ -1,4 +1,3 @@
-kubectl apply -f - << EOF
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
