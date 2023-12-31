@@ -43,7 +43,7 @@ yq --inplace '.spec.template.spec.containers[0].image = "nginx:1.24.0"' kustomiz
 - Commit change to git
 
 ``` bash
-git add kustomization-demo/flux-config/manifests/deploy.yaml;
+git add kustomization-demo/manifests/deploy.yaml;
 git commit -m "change image 2";
 git push origin fluxcd-demo
 ```
