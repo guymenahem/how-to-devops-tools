@@ -1,0 +1,20 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: auth-application
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/guymenahem/how-to-devops-tools/
+    path: argocd/deploy/demo-application/app-resources/auth
+    targetRevision: main
+  destination:
+      server: https://kubernetes.default.svc
+      namespace: default
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+      allowEmpty: true
