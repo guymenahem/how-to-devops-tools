@@ -15,5 +15,5 @@ spec:
         app: frontend-app
     spec:
       containers:
-      - name: frontend-app
-        image: nginx:1.23.0
+        - name: frontend-app
+          image: nginx:1.23.0
