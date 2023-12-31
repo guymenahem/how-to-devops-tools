@@ -11,8 +11,8 @@ spec:
     path: argocd/deploy/app-resources/frontend
     targetRevision: main
   destination:
-      server: https://kubernetes.default.svc
-      namespace: default
+    server: https://kubernetes.default.svc
+    namespace: default
   syncPolicy:
     automated:
       selfHeal: true

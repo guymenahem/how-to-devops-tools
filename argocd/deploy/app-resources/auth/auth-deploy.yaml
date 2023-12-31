@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-app
+  name: auth
   labels:
-    app: backend-app
+    app: auth
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: backend-app
+      app: auth
   template:
     metadata:
       labels:
-        app: backend-app
+        app: auth
     spec:
       containers:
-      - name: backend-app
-        image: nginx:1.23.0
+        - name: auth
+          image: nginx:1.23.0
