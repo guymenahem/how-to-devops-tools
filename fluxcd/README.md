@@ -37,13 +37,13 @@ kubectl apply -f kustomization-demo/flux-config
 ## Deploy new version by updating new image on repo
 
 ``` bash
-yq --inplace '.spec.template.spec.containers[0].image = "nginx:1.24.0"' kustomization-demo/flux-config/kustomizations.yaml
+yq --inplace '.spec.template.spec.containers[0].image = "nginx:1.24.0"' kustomization-demo/manifests/deploy.yaml
 ```
 
 - Commit change to git
 
 ``` bash
-git add kustomization-demo/flux-config/kustomizations.yaml;
+git add kustomization-demo/flux-config/manifests/deploy.yaml;
 git commit -m "change image 2";
 git push origin fluxcd-demo
 ```
