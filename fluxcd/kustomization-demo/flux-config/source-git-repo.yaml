@@ -1,0 +1,11 @@
+kubectl apply -f - << EOF
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: how-to-devops-tools
+  namespace: default
+spec:
+  interval: 1m0s
+  url: https://github.com/guymenahem/how-to-devops-tools
+  ref:
+    branch: fluxcd-demo
