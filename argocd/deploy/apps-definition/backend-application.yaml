@@ -8,7 +8,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/guymenahem/how-to-devops-tools/
-    path: argocd/deploy/demo-application/app-resources/backend
+    path: argocd/deploy/app-resources/backend
     targetRevision: main
   destination:
       server: https://kubernetes.default.svc
