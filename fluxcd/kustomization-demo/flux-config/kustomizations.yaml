@@ -1,0 +1,13 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: demo-app
+  namespace: default
+spec:
+  interval: 1m0s
+  path: ./fluxcd/kustomization-demo/manifests
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: how-to-devops-tools
+  
