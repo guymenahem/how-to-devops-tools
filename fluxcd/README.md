@@ -32,14 +32,39 @@ git push origin fluxcd-demo
 kubectl apply -f kustomization-demo/flux-config
 ```
 
+- Check deployed pods
+
+## Deploy new version by updating new image on repo
+
+``` bash
+yq --inplace '.spec.template.spec.containers[0].image = "nginx:1.24.0"' kustomization-demo/flux-config/kustomizations.yaml
+```
+
+- Commit change to git
+
+``` bash
+git add kustomization-demo/flux-config/kustomizations.yaml;
+git commit -m "change image 2";
+git push origin fluxcd-demo
+```
+
+- Check deployed pods
+
+## Deploy new version by overlay kustomization
+
 - Add overlay using Kustomize
 
 ``` bash
 tee -a kustomization-demo/flux-config/kustomizations.yaml << EOF
   patches:
-  - op: add
-    path: /spec/template/spec/containers/0/image
-    value: 1.25.0
+    - patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/image
+          value: nginx:1.25.0
+      target:
+        kind: Deployment
+        name: demo-application
+        namespace: default
 EOF
 ```
 
@@ -47,11 +72,17 @@ EOF
 
 ``` bash
 git add kustomization-demo/flux-config/kustomizations.yaml;
-git commit -m "change image";
+git commit -m "change image 2";
 git push origin fluxcd-demo
 ```
 
-## Deploy using Helm
+- Apply the configuration
+
+``` bash
+kubectl apply -f kustomization-demo/flux-config
+```
+
+## Deploy Helm release using the Helm controller
 
 - Add Helm repo
 
