@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: save-orders-app
+  labels:
+    app: save-orders-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: save-orders-app
+  template:
+    metadata:
+      labels:
+        app: save-orders-app
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "save-orders-app"
+    spec:
+      containers:
+        - image: dapr-orders-app:0.0.1
+          imagePullPolicy: IfNotPresent
+          name: save-orders-app
+          env:
+            - name: "STATE_WOKER_ROLE"
+              value: "writer"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: get-orders-app
+  labels:
+    app: get-orders-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: get-orders-app
+  template:
+    metadata:
+      labels:
+        app: get-orders-app
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "get-orders-app"
+    spec:
+      containers:
+        - image: dapr-orders-app:0.0.1
+          imagePullPolicy: IfNotPresent
+          name: get-orders-app
+          env:
+            - name: "STATE_WOKER_ROLE"
+              value: "reader"
