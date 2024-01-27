@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-generator-app
+  labels:
+    app: orders-generator-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders-generator-app
+  template:
+    metadata:
+      labels:
+        app: orders-generator-app
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "orders-generator-app"
+    spec:
+      containers:
+        - image: dapr-orders-processing:0.0.1
+          imagePullPolicy: IfNotPresent
+          name: orders-generator-app
+          env:
+            - name: "BINDINGS_ROLE"
+              value: "writer"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-processor-app
+  labels:
+    app: orders-processor-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders-processor-app
+  template:
+    metadata:
+      labels:
+        app: orders-processor-app
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "orders-processor-app"
+        dapr.io/app-port: "6002"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+        - image: dapr-orders-processing:0.0.1
+          imagePullPolicy: IfNotPresent
+          name: orders-processor-app
+          env:
+            - name: "BINDINGS_ROLE"
+              value: "reader"
+          ports:
+            - containerPort: 6002

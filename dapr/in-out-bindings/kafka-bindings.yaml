@@ -1,0 +1,20 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout
+spec:
+  type: bindings.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: my-cluster-kafka-brokers.strimzi.svc.cluster.local:9092
+  - name: topics
+    value: "orders"
+  - name: consumerGroup
+    value: "order-group"
+  - name: publishTopic
+    value: "orders"
+  - name: authRequired
+    value: false
+  - name: direction
+    value: "input, output"
