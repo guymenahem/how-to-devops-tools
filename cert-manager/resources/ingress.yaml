@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-app-ingress
+  annotations:
+    cert-manager.io/issuer: "self-signed-staging"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - "*.thegoodguy.io"
+    secretName: quickstart-example-tls
+  rules:
+  - host: "*.thegoodguy.io"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-app
+            port:
+              number: 80
