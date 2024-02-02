@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package buying_intent;
+
+
+service BuyingIntentService {
+    rpc GetBuyingIntent(UserBuyingInfo) returns (BuyingIntentResponse);
+}
+
+message UserBuyingInfo {
+    string userName = 1;
+    string productName = 2;
+    float price = 3;
+    int64 lastActivityTimestamp = 4;
+}
+
+message BuyingIntentResponse {
+    int32 buyingIntentScore = 1;
+}
