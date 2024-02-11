@@ -1,0 +1,11 @@
+adminPassword: admin
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Thanos
+        type: prometheus
+        url: http://thanos-query-frontend.thanos.svc.cluster.local:9090
+        access: proxy
+persistence:
+  enabled: true
