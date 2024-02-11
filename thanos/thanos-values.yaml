@@ -1,0 +1,37 @@
+querier:
+  stores:
+    - prometheus-operator-kube-p-prometheus-thanos.prom1.svc.cluster.local:10901
+    - prometheus-cluster2-kube-p-prometheus-thanos.prom2.svc.cluster.local:10901
+
+objstoreConfig: |-
+  type: s3
+  config:
+    bucket: thanos
+    endpoint: {{ include "thanos.minio.fullname" . }}.thanos.svc.cluster.local:9000
+    access_key: minio
+    secret_key: KEY
+    insecure: true
+
+bucketweb:
+  enabled: true
+compactor:
+  enabled: true
+storegateway:
+  enabled: true
+ruler:
+  enabled: true
+  alertmanagers:
+    - http://prometheus-operator-alertmanager.monitoring.svc.cluster.local:9093
+  config: |-
+    groups:
+      - name: "metamonitoring"
+        rules:
+          - alert: "PrometheusDown"
+            expr: absent(up{prometheus="monitoring/prometheus-operator"})
+minio:
+  enabled: true
+  accessKey:
+    password: "minio"
+  secretKey:
+    password: "KEY"
+  defaultBuckets: "thanos"
