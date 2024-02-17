@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- demo_v1_echoserver.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
