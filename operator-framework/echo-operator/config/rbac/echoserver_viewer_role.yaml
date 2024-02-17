@@ -1,0 +1,27 @@
+# permissions for end users to view echoservers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: echoserver-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: echo-operator
+    app.kubernetes.io/part-of: echo-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: echoserver-viewer-role
+rules:
+- apiGroups:
+  - demo.thegoodguy.io
+  resources:
+  - echoservers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - demo.thegoodguy.io
+  resources:
+  - echoservers/status
+  verbs:
+  - get

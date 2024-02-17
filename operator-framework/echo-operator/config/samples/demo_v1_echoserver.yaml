@@ -1,0 +1,12 @@
+apiVersion: demo.thegoodguy.io/v1
+kind: EchoServer
+metadata:
+  labels:
+    app.kubernetes.io/name: echoserver
+    app.kubernetes.io/instance: echoserver-sample
+    app.kubernetes.io/part-of: echo-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: echo-operator
+  name: echoserver-sample
+spec:
+  # TODO(user): Add fields here
