@@ -98,3 +98,28 @@ spec:
   message: "My First Operator in Go!"
 EOF
 ```
+
+- Check the CR
+
+```bash
+kubectl describe EchoServer my-echo
+```
+
+- Check the Deployment & Service created
+
+```bash
+kubectl get deploy -n default
+kubectl get svc -n default
+```
+
+- Port forward to new server
+
+```bash
+kubectl port-forward svc/my-echo-echo-service -n default 8080:8080
+```
+
+- On a new windows, run a request to this service
+
+```bash
+curl 127.0.0.1:8080
+```
