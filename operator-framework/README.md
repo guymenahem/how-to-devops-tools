@@ -96,6 +96,7 @@ metadata:
   name: my-echo
 spec:
   message: "My First Operator in Go!"
+  size: 3
 EOF
 ```
 

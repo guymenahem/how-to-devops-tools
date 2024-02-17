@@ -28,7 +28,7 @@ func echoServiceName(v *appv1.EchoServer) string {
 
 func (r *EchoServerReconciler) echoDeployment(v *appv1.EchoServer) *appsv1.Deployment {
 	labels := labels(v, "echo")
-	size := int32(1)
+	size := v.Spec.Size
 	message := v.Spec.Message
 
 	dep := &appsv1.Deployment{
@@ -108,7 +108,7 @@ func (r *EchoServerReconciler) handleEchoChanges(v *appv1.EchoServer) (*reconcil
 		return &reconcile.Result{RequeueAfter: 5 * time.Second}, err
 	}
 
-	size := int32(1)
+	size := v.Spec.Size
 
 	if size != *found.Spec.Replicas {
 		found.Spec.Replicas = &size

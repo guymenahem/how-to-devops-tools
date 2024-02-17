@@ -26,6 +26,7 @@ import (
 // EchoServerSpec defines the desired state of EchoServer
 type EchoServerSpec struct {
 	Message string `json:"message,omitempty"`
+	Size    int32  `json:"size"`
 }
 
 // EchoServerStatus defines the observed state of EchoServer
