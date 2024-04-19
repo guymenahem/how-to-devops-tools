@@ -60,7 +60,7 @@ curl http://localhost:11434/api/generate -d '{
 ``` bash
 curl http://localhost:11434/api/create -d '{
   "name": "sql-model",
-  "modelfile": "FROM mistral\nSYSTEM You are data analyst trying to query data from the DB\nPARAMETER temperature 0.2\nTEMPLATE \"\"\"[INST]{{ if .System }}<<SYS>>{{ .System }}<</SYS>>{{ end }}sql query{{ .Prompt }} [/INST]\"\"\""
+  "modelfile": "FROM mistral\nSYSTEM You are data analyst trying to help people to query from their databases. They send you a tables strcture and they want to query and you help them with that. \nPARAMETER temperature 0.2\n"
 }'
 ```
 
@@ -79,7 +79,14 @@ curl http://localhost:11434/api/generate -d '{
 ```bash
 curl http://localhost:11434/api/generate -d '{
   "model": "sql-model",
-  "prompt": "I have an SQL table with obsesrvability metrics of my services. The table name is services_metrics, with the columns id, timestamp, service_name, mem_usage, cpu_usage. What query should I run in SQL to get my average memory usage? In you answer please contain only the sql query",
+  "prompt": " I have an SQL table with the observability metrics of my services \
+              called services_metrics stored in a Postgres database, the columns of the tables are id, timestamp, service_name, mem_usage, cpu_usage.                  
+                                          \
+              For example: \
+              user: 'get me the average memory' answer: 'SELECT AVG(mem) FROM table' \
+              user: 'get me the average cpu' answer: 'SELECT AVG(cpu) FROM table' \
+              user: 'Write me the SQL query to get my average memory usage of the service aggregator?' \
+              Important: Return only the query and nothing more.",
   "stream": false
 }' | jq '.response'
 ```
