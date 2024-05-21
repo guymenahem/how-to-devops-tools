@@ -90,3 +90,22 @@ curl http://localhost:11434/api/generate -d '{
   "stream": false
 }' | jq '.response'
 ```
+
+
+## Build Chat App
+
+```bash
+docker build . -t chat-test:0.0.1
+```
+
+```bash
+kind load docker-image chat-test:0.0.1 --name single-node-cluster
+```
+
+```bash
+kubectl apply -f observability-chat/deploy.yaml
+```
+
+```bash
+kubectl 
+```
