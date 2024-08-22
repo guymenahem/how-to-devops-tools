@@ -12,10 +12,10 @@ wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
 ## Deploy a cluster
 
-- Deploy you first cluster
+- Deploy your first cluster
 
 ```bash
-k3d cluster create mycluster
+k3d cluster create my-cluster-ingress -p "8080:8080@loadbalancer" --agents 2
 ```
 
 - Check the nodes (running on docker)
@@ -83,7 +83,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`nginx.local`)
+    - match: Host('nginx.local')
       kind: Rule
       services:
         - name: my-nginx-service
@@ -91,13 +91,7 @@ spec:
 EOF
 ```
 
-- Create a k3d port
-
-```bash
-k3d cluster create test-ingress -p "8080:8080@loadbalancer" --agents 2
-```
-
-- Add record to /etc/hosts
+- Add a record to /etc/hosts
 
 ```bash
 echo "127.0.0.1 nginx.local" | sudo tee -a /etc/hosts
