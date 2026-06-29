@@ -2,7 +2,6 @@ import os
 import logging
 import time
 import psycopg2
-from distutils.util import strtobool
 from flask import Flask
 from flask import make_response
 
