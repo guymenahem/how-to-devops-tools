@@ -27,7 +27,7 @@ def do_ready_check_db_operation():
 
 @app.route('/live_check')
 def live_check():
-    return make_response(200)
+    return make_response("ok", 200)
 
 
 @app.route('/ready_check')
