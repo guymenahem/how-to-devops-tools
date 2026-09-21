@@ -2,7 +2,6 @@ import os
 import logging
 import time
 import signal
-from distutils.util import strtobool
 from flask import Flask
 from flask import make_response
 
@@ -15,10 +14,13 @@ liveness_fail_msg = "LIVE_FAIL_MSG"
 readiness_env_should_fail = "FAIL_READY"
 readiness_fail_msg = "READY_FAIL_MSG"
 
+def parse_env_bool(value):
+    return str(value).strip().lower() in {"1", "true", "t", "yes", "y", "on"}
+
 
 @app.route('/live')
 def live_check():
-    should_fail_live = strtobool(os.environ.get(liveness_env_should_fail, False))
+    should_fail_live = parse_env_bool(os.environ.get(liveness_env_should_fail, False))
     if should_fail_live:
         msg = os.environ.get(liveness_fail_msg, "Internal Server Error")
         logging.error(msg + " - retrying")
@@ -31,7 +33,7 @@ def live_check():
 
 @app.route('/ready')
 def ready_check():
-    should_fail_ready = strtobool(os.environ.get(readiness_env_should_fail, False))
+    should_fail_ready = parse_env_bool(os.environ.get(readiness_env_should_fail, False))
     if should_fail_ready:
         msg = os.environ.get(readiness_fail_msg, "Internal Server Error")
         logging.error(msg + " - retrying")
