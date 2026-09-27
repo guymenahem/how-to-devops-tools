@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
-	"time"
 	"os/signal"
 	"syscall"
-	"context"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,19 +21,22 @@ import (
 var log = logrus.New()
 var INTERVAL_TIME = 3 * time.Second
 
-func start_service(){
+func start_service() {
 	log.Info("Service init process")
 	service_init()
 }
 
-func service_init(){
+func service_init() {
 	klog.InitFlags(nil)
 
 	var kubeconfig string
 	var leaseLockName string
 	var leaseLockNamespace string
 	var id string
-	hostname, nil := os.Hostname()
+	hostname, err := os.Hostname()
+	if err != nil {
+		klog.Fatal(err)
+	}
 
 	flag.StringVar(&kubeconfig, "kubeconfig", "", "absolute path to the kubeconfig file")
 	flag.StringVar(&id, "id", hostname, "the holder identity name")
@@ -56,8 +59,7 @@ func service_init(){
 
 	// Run the service loop
 	run := func(ctx context.Context) {
-		service_loop()
-		select {}
+		service_loop(ctx)
 	}
 
 	// use a Go context so we can tell the leaderelection code when we
@@ -89,7 +91,7 @@ func service_init(){
 
 	// start the leader election code loop
 	leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
-		Lock: lock,
+		Lock:            lock,
 		ReleaseOnCancel: true,
 		LeaseDuration:   60 * time.Second,
 		RenewDeadline:   15 * time.Second,
@@ -118,10 +120,17 @@ func service_init(){
 
 }
 
-func service_loop(){
+// service_loop returns as soon as ctx is cancelled, which is what lets the
+// leader release the lease on shutdown instead of holding it until it expires.
+func service_loop(ctx context.Context) {
 	for {
 		log.Info("I'm the leader! running changes")
-		time.Sleep(INTERVAL_TIME)
+		select {
+		case <-ctx.Done():
+			log.Info("context cancelled, stopping the service loop")
+			return
+		case <-time.After(INTERVAL_TIME):
+		}
 	}
 }
 
