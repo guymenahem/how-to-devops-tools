@@ -1,0 +1,95 @@
+{
+  "_args": [
+    [
+      "markdown-it-anchor@8.6.4",
+      "/Users/fenster/dev/protobuf.js/cli"
+    ]
+  ],
+  "_from": "markdown-it-anchor@8.6.4",
+  "_id": "markdown-it-anchor@8.6.4",
+  "_inBundle": false,
+  "_integrity": "sha512-Ul4YVYZNxMJYALpKtu+ZRdrryYt/GlQ5CK+4l1bp/gWXOG2QWElt6AqF3Mih/wfUKdZbNAZVXGR73/n6U/8img==",
+  "_location": "/markdown-it-anchor",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "markdown-it-anchor@8.6.4",
+    "name": "markdown-it-anchor",
+    "escapedName": "markdown-it-anchor",
+    "rawSpec": "8.6.4",
+    "saveSpec": null,
+    "fetchSpec": "8.6.4"
+  },
+  "_requiredBy": [
+    "/jsdoc"
+  ],
+  "_resolved": "https://registry.npmjs.org/markdown-it-anchor/-/markdown-it-anchor-8.6.4.tgz",
+  "_spec": "8.6.4",
+  "_where": "/Users/fenster/dev/protobuf.js/cli",
+  "bugs": {
+    "url": "https://github.com/valeriangalliat/markdown-it-anchor/issues"
+  },
+  "contributors": [
+    {
+      "name": "Val",
+      "url": "https://val.codejam.info/"
+    },
+    {
+      "name": "Nagao, Fabio Zendhi",
+      "email": "nagaozen@gmail.com",
+      "url": "https://github.com/nagaozen/"
+    }
+  ],
+  "description": "Header anchors for markdown-it.",
+  "devDependencies": {
+    "ava": "^3.15.0",
+    "markdown-it": "*",
+    "markdown-it-attrs": "^3.0.1",
+    "microbundle": "^0.12.0",
+    "source-map-support": "^0.5.19",
+    "standard": "^14.3.1"
+  },
+  "files": [
+    "README.md",
+    "UNLICENSE",
+    "dist/*",
+    "runkit.js",
+    "types/*"
+  ],
+  "homepage": "https://github.com/valeriangalliat/markdown-it-anchor#readme",
+  "keywords": [
+    "markdown",
+    "markdown-it",
+    "markdown-it-plugin",
+    "header",
+    "anchor"
+  ],
+  "license": "Unlicense",
+  "main": "dist/markdownItAnchor.js",
+  "mangle": {
+    "regex": "^_"
+  },
+  "module": "dist/markdownItAnchor.mjs",
+  "name": "markdown-it-anchor",
+  "peerDependencies": {
+    "@types/markdown-it": "*",
+    "markdown-it": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valeriangalliat/markdown-it-anchor.git"
+  },
+  "runkitExampleFilename": "runkit.js",
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "lint": "standard index.js test.js",
+    "prepare": "npm run build && npm test",
+    "test": "npm run lint && ava test.js"
+  },
+  "source": "index.js",
+  "types": "./types/index.d.ts",
+  "unpkg": "dist/markdownItAnchor.umd.js",
+  "version": "8.6.4"
+}
