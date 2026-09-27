@@ -9,4 +9,5 @@ metadata:
     app.kubernetes.io/created-by: echo-operator
   name: echoserver-sample
 spec:
-  # TODO(user): Add fields here
+  message: "My First Operator in Go!"
+  size: 3

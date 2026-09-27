@@ -18,8 +18,8 @@ def make_grpc_request(stub):
     try:
         response = stub.GetBuyingIntent(request)
         print(f"Response: {response.buyingIntentScore}")
-    except grpc._channel._InactiveRpcError:
-        print("RPC error")
+    except grpc.RpcError as e:
+        print(f"RPC error: {e.code()}")
 
 def main():
     channel = grpc.insecure_channel('localhost:8080')

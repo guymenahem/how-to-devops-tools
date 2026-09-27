@@ -1,9 +1,7 @@
-import os
 import logging
-import time
+import os
 import uuid
 import psycopg2
-from distutils.util import strtobool
 from flask import Flask
 from flask import make_response
 
@@ -16,50 +14,64 @@ test_account = {
     'email': 'ready-test@ready-test.com'
     }
 
-def get_db_conn():
-    return psycopg2.connect(user = "postgres", password = "postgres", host = "postgres-postgresql.default.svc.cluster.local", port = "5432")
+DB_HOST = os.environ.get("DB_HOST", "postgres-postgresql.default.svc.cluster.local")
+DB_PORT = os.environ.get("DB_PORT", "5432")
 
-def run_pg_modify(clause):
+def get_db_conn():
+    return psycopg2.connect(user = "postgres", password = "postgres", host = DB_HOST, port = DB_PORT, connect_timeout = 3)
+
+def run_pg_modify(clause, params=None):
+    conn = None
     try:
         conn = get_db_conn()
         cur = conn.cursor()
-        cur.execute(clause)
+        cur.execute(clause, params)
         conn.commit()
-        conn.close()
         return True
     except Exception as e:
         logging.error(f"error while performing DB opertaion - {clause}")
         logging.exception(e)
         return None
-    
+    finally:
+        # Close on the error path too, instead of leaving it to the garbage
+        # collector.
+        if conn is not None:
+            conn.close()
 
-def run_pg_query(query):
+
+def run_pg_query(query, params=None):
+    conn = None
     try:
         conn = get_db_conn()
         cur = conn.cursor()
-        cur.execute(query)
-        rows = cur.fetchall()
-        conn.close()
+        cur.execute(query, params)
+        return cur.fetchall()
     except Exception as e:
         logging.error(f"error while fetching information from DB using query - {query}")
         logging.exception(e)
         return None
-    return rows
+    finally:
+        if conn is not None:
+            conn.close()
 
 def can_read_from_db():
-    return run_pg_query(f'SELECT * FROM accounts LIMIT 1;')
+    return run_pg_query('SELECT * FROM accounts LIMIT 1;')
 
 def can_write_from_db(account_name):
-    return run_pg_modify(f'INSERT INTO accounts(name,owner_email,created_on) VALUES(\'{account_name}\', \'{test_account["email"]}\', CURRENT_DATE);')
+    return run_pg_modify(
+        'INSERT INTO accounts(name,owner_email,created_on) VALUES(%s, %s, CURRENT_DATE);',
+        (account_name, test_account["email"]),
+    )
 
 def can_delete_from_db(account_name):
-    return run_pg_modify(f'DELETE FROM accounts WHERE name =\'{account_name}\'')
+    return run_pg_modify('DELETE FROM accounts WHERE name = %s', (account_name,))
 
 
 def do_ready_check_db_operation():
 
-    # Check read from DB
-    if not can_read_from_db():
+    # Check read from DB. An empty table is a healthy result, so only None
+    # means the query itself failed.
+    if can_read_from_db() is None:
         logging.warning("could not read from DB during ready check")
         return False
     
@@ -82,7 +94,7 @@ def do_ready_check_db_operation():
 
 @app.route('/live_check')
 def live_check():
-    return make_response(200)
+    return make_response("ok", 200)
 
 
 @app.route('/ready_check')

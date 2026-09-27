@@ -12,14 +12,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-func (r *EchoServerReconciler) ensureDeployment(request reconcile.Request,
+func (r *EchoServerReconciler) ensureDeployment(ctx context.Context,
 	instance *appv1.EchoServer,
 	dep *appsv1.Deployment,
 ) (*reconcile.Result, error) {
 
 	// See if deployment already exists and create if it doesn't
 	found := &appsv1.Deployment{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{
+	err := r.Client.Get(ctx, types.NamespacedName{
 		Name:      dep.Name,
 		Namespace: instance.Namespace,
 	}, found)
@@ -27,7 +27,7 @@ func (r *EchoServerReconciler) ensureDeployment(request reconcile.Request,
 
 		// Create the deployment
 		log.Info("Creating a new Deployment", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
-		err = r.Client.Create(context.TODO(), dep)
+		err = r.Client.Create(ctx, dep)
 
 		if err != nil {
 			// Deployment failed
@@ -46,12 +46,12 @@ func (r *EchoServerReconciler) ensureDeployment(request reconcile.Request,
 	return nil, nil
 }
 
-func (r *EchoServerReconciler) ensureService(request reconcile.Request,
+func (r *EchoServerReconciler) ensureService(ctx context.Context,
 	instance *appv1.EchoServer,
 	s *corev1.Service,
 ) (*reconcile.Result, error) {
 	found := &corev1.Service{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{
+	err := r.Client.Get(ctx, types.NamespacedName{
 		Name:      s.Name,
 		Namespace: instance.Namespace,
 	}, found)
@@ -59,7 +59,7 @@ func (r *EchoServerReconciler) ensureService(request reconcile.Request,
 
 		// Create the service
 		log.Info("Creating a new Service", "Service.Namespace", s.Namespace, "Service.Name", s.Name)
-		err = r.Client.Create(context.TODO(), s)
+		err = r.Client.Create(ctx, s)
 
 		if err != nil {
 			// Creation failed
@@ -81,6 +81,7 @@ func (r *EchoServerReconciler) ensureService(request reconcile.Request,
 func labels(v *appv1.EchoServer, tier string) map[string]string {
 	return map[string]string{
 		"app":           "echo",
+		"tier":          tier,
 		"echoserver_cr": v.Name,
 	}
 }

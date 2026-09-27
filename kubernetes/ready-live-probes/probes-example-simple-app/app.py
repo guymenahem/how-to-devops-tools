@@ -2,7 +2,6 @@ import os
 import logging
 import time
 import signal
-from distutils.util import strtobool
 from flask import Flask
 from flask import make_response
 
@@ -16,9 +15,17 @@ readiness_env_should_fail = "FAIL_READY"
 readiness_fail_msg = "READY_FAIL_MSG"
 
 
+TRUE_VALUES = {"y", "yes", "t", "true", "on", "1"}
+
+
+def should_fail(env_var):
+    # An unset or unrecognised value must never take the probe down.
+    return os.environ.get(env_var, "false").strip().lower() in TRUE_VALUES
+
+
 @app.route('/live')
 def live_check():
-    should_fail_live = strtobool(os.environ.get(liveness_env_should_fail, False))
+    should_fail_live = should_fail(liveness_env_should_fail)
     if should_fail_live:
         msg = os.environ.get(liveness_fail_msg, "Internal Server Error")
         logging.error(msg + " - retrying")
@@ -31,7 +38,7 @@ def live_check():
 
 @app.route('/ready')
 def ready_check():
-    should_fail_ready = strtobool(os.environ.get(readiness_env_should_fail, False))
+    should_fail_ready = should_fail(readiness_env_should_fail)
     if should_fail_ready:
         msg = os.environ.get(readiness_fail_msg, "Internal Server Error")
         logging.error(msg + " - retrying")
@@ -65,9 +72,10 @@ def start_ready():
     os.environ[readiness_env_should_fail] = "False"
     return make_response("OK", 200)
 
-@app.route('/exit/<exit_code>')
+@app.route('/exit/<int:exit_code>')
 def exit_using_code(exit_code):
-    exit(exit_code)
+    logging.critical('Exiting with code: %s', exit_code)
+    os._exit(exit_code)
 
 def exit_gracefully(signalNumber, frame):
     logging.critical('Received: %s' % signalNumber)

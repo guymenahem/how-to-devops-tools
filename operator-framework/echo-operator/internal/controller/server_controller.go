@@ -2,12 +2,15 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	appv1 "github.com/guymenahem/how-to-devops-tools/api/v1"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -24,6 +27,15 @@ func echoDeploymentName(v *appv1.EchoServer) string {
 
 func echoServiceName(v *appv1.EchoServer) string {
 	return v.Name + "-echo-service"
+}
+
+// echoArgs builds the http-echo command line. Container args are exec'd
+// without a shell, so the message must not be wrapped in quotes.
+func echoArgs(message string) []string {
+	return []string{
+		fmt.Sprintf("-listen=:%d", echoPort),
+		"-text=" + message,
+	}
 }
 
 func (r *EchoServerReconciler) echoDeployment(v *appv1.EchoServer) *appsv1.Deployment {
@@ -54,10 +66,7 @@ func (r *EchoServerReconciler) echoDeployment(v *appv1.EchoServer) *appsv1.Deplo
 							ContainerPort: echoPort,
 							Name:          "echo-server",
 						}},
-						Args: []string{
-							"-listen=:8080",
-							"-text='" + message + "'",
-						},
+						Args: echoArgs(message),
 					}},
 				},
 			},
@@ -91,29 +100,57 @@ func (r *EchoServerReconciler) echoService(v *appv1.EchoServer) *corev1.Service 
 	return s
 }
 
-func (r *EchoServerReconciler) updateEchoStatus(v *appv1.EchoServer) error {
-	v.Status.EchoStatus = "Ready"
-	err := r.Client.Status().Update(context.TODO(), v)
-	return err
+func (r *EchoServerReconciler) updateEchoStatus(ctx context.Context, v *appv1.EchoServer) error {
+	status := "Pending"
+
+	found := &appsv1.Deployment{}
+	err := r.Client.Get(ctx, types.NamespacedName{
+		Name:      echoDeploymentName(v),
+		Namespace: v.Namespace,
+	}, found)
+	if err == nil && found.Status.ReadyReplicas == v.Spec.Size {
+		status = "Ready"
+	}
+
+	if v.Status.EchoStatus == status {
+		return nil
+	}
+
+	v.Status.EchoStatus = status
+	return r.Client.Status().Update(ctx, v)
 }
 
-func (r *EchoServerReconciler) handleEchoChanges(v *appv1.EchoServer) (*reconcile.Result, error) {
+func (r *EchoServerReconciler) handleEchoChanges(ctx context.Context, v *appv1.EchoServer) (*reconcile.Result, error) {
 	found := &appsv1.Deployment{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{
+	err := r.Client.Get(ctx, types.NamespacedName{
 		Name:      echoDeploymentName(v),
 		Namespace: v.Namespace,
 	}, found)
 	if err != nil {
-		// The deployment may not have been created yet, so requeue
-		return &reconcile.Result{RequeueAfter: 5 * time.Second}, err
+		if errors.IsNotFound(err) {
+			// The deployment may not have hit the cache yet, so just requeue.
+			return &reconcile.Result{RequeueAfter: 5 * time.Second}, nil
+		}
+		return &reconcile.Result{}, err
 	}
 
 	size := v.Spec.Size
+	desiredArgs := echoArgs(v.Spec.Message)
 
-	if size != *found.Spec.Replicas {
+	changed := false
+	if found.Spec.Replicas == nil || size != *found.Spec.Replicas {
 		found.Spec.Replicas = &size
-		err = r.Client.Update(context.TODO(), found)
-		if err != nil {
+		changed = true
+	}
+	// Without this a change to spec.message is never rolled out.
+	containers := found.Spec.Template.Spec.Containers
+	if len(containers) > 0 && !equality.Semantic.DeepEqual(containers[0].Args, desiredArgs) {
+		containers[0].Args = desiredArgs
+		changed = true
+	}
+
+	if changed {
+		if err := r.Client.Update(ctx, found); err != nil {
 			log.Error(err, "Failed to update Deployment.", "Deployment.Namespace", found.Namespace, "Deployment.Name", found.Name)
 			return &reconcile.Result{}, err
 		}

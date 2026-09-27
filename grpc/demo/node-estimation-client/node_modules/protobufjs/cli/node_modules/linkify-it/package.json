@@ -1,0 +1,83 @@
+{
+  "_args": [
+    [
+      "linkify-it@3.0.3",
+      "/Users/fenster/dev/protobuf.js/cli"
+    ]
+  ],
+  "_from": "linkify-it@3.0.3",
+  "_id": "linkify-it@3.0.3",
+  "_inBundle": false,
+  "_integrity": "sha512-ynTsyrFSdE5oZ/O9GEf00kPngmOfVwazR5GKDq6EYfhlpFug3J2zybX56a2PRRpc9P+FuSoGNAwjlbDs9jJBPQ==",
+  "_location": "/linkify-it",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "linkify-it@3.0.3",
+    "name": "linkify-it",
+    "escapedName": "linkify-it",
+    "rawSpec": "3.0.3",
+    "saveSpec": null,
+    "fetchSpec": "3.0.3"
+  },
+  "_requiredBy": [
+    "/markdown-it"
+  ],
+  "_resolved": "https://registry.npmjs.org/linkify-it/-/linkify-it-3.0.3.tgz",
+  "_spec": "3.0.3",
+  "_where": "/Users/fenster/dev/protobuf.js/cli",
+  "bugs": {
+    "url": "https://github.com/markdown-it/linkify-it/issues"
+  },
+  "dependencies": {
+    "uc.micro": "^1.0.1"
+  },
+  "description": "Links recognition library with FULL unicode support",
+  "devDependencies": {
+    "ansi": "^0.3.0",
+    "autoprefixer-stylus": "^0.14.0",
+    "benchmark": "^2.1.0",
+    "browserify": "^16.2.3",
+    "coveralls": "^3.0.2",
+    "eslint": "^7.0.0",
+    "gh-pages": "^2.2.0",
+    "mdurl": "^1.0.0",
+    "mocha": "^7.1.2",
+    "ndoc": "^5.0.1",
+    "nyc": "^15.0.1",
+    "pug-cli": "^1.0.0-alpha6",
+    "shelljs": "^0.8.4",
+    "shx": "^0.3.2",
+    "stylus": "~0.54.5",
+    "tlds": "^1.166.0"
+  },
+  "files": [
+    "index.js",
+    "lib/"
+  ],
+  "homepage": "https://github.com/markdown-it/linkify-it#readme",
+  "keywords": [
+    "linkify",
+    "linkifier",
+    "autolink",
+    "autolinker"
+  ],
+  "license": "MIT",
+  "name": "linkify-it",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markdown-it/linkify-it.git"
+  },
+  "scripts": {
+    "coverage": "npm run test && nyc report --reporter html",
+    "demo": "npm run lint && node support/build_demo.js",
+    "doc": "node support/build_doc.js",
+    "gh-pages": "npm run demo && npm run doc && shx cp -R doc/ demo/ && gh-pages -d demo -f",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run gh-pages",
+    "report-coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test": "npm run lint && nyc mocha"
+  },
+  "version": "3.0.3"
+}
