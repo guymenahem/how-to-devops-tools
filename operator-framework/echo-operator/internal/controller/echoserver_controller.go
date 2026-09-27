@@ -18,6 +18,9 @@ package controller
 
 import (
 	"context"
+
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -62,7 +65,7 @@ func (r *EchoServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Fetch the EchoServer instance
 	v := &appv1.EchoServer{}
-	err := r.Client.Get(context.TODO(), req.NamespacedName, v)
+	err := r.Client.Get(ctx, req.NamespacedName, v)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after ctrl req.
@@ -76,23 +79,23 @@ func (r *EchoServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	var result *ctrl.Result
 
-	result, err = r.ensureDeployment(req, v, r.echoDeployment(v))
+	result, err = r.ensureDeployment(ctx, v, r.echoDeployment(v))
 	if result != nil {
 		return *result, err
 	}
 
-	result, err = r.ensureService(req, v, r.echoService(v))
+	result, err = r.ensureService(ctx, v, r.echoService(v))
 	if result != nil {
 		return *result, err
 	}
 
-	err = r.updateEchoStatus(v)
+	err = r.updateEchoStatus(ctx, v)
 	if err != nil {
 		// Requeue the req if the status could not be updated
 		return ctrl.Result{}, err
 	}
 
-	result, err = r.handleEchoChanges(v)
+	result, err = r.handleEchoChanges(ctx, v)
 	if result != nil {
 		return *result, err
 	}
@@ -104,5 +107,9 @@ func (r *EchoServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 func (r *EchoServerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&appv1.EchoServer{}).
+		// Without these the operator never reacts to someone editing or
+		// deleting the resources it owns.
+		Owns(&appsv1.Deployment{}).
+		Owns(&corev1.Service{}).
 		Complete(r)
 }
