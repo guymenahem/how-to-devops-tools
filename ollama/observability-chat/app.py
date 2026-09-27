@@ -25,16 +25,21 @@ APP_MODELS = [
 def get_available_models():
     try:
         response = requests.get(f"{LLM_API_URL}/tags")
+        response.raise_for_status()
         models_response = response.json()
         return models_response["models"]
     except Exception as e:
         logging.exception(e)
+        return []
 
 def create_model(model_name, required_models):
-    model = next((m for m in required_models if m["name"] == model_name))
+    model = next((m for m in required_models if m["name"] == model_name), None)
+    if model is None:
+        logging.error("no definition found for model %s", model_name)
+        return
     try:
-        request = {"model": model["name"], "modelfile": model["modelfile"]}
-        response = requests.post(f"{LLM_API_URL}/create", json=request)
+        payload = {"model": model["name"], "modelfile": model["modelfile"]}
+        response = requests.post(f"{LLM_API_URL}/create", json=payload)
         response.raise_for_status()
     except Exception as e:
         logging.exception(e)
@@ -45,13 +50,14 @@ def set_up_models(models):
     logging.info("the available models are: %s", available_models)
     logging.info("the required models are: %s", required_models_names)
 
-    if len(set(required_models_names) - set(available_models)) == 0:
+    missing_models = set(required_models_names) - set(available_models)
+    if not missing_models:
         logging.info("All models available")
     else:
-        logging.info("missing models are: %s", set(required_models_names) - set(available_models))
-        for model in set(required_models_names) - set(available_models):
-            create_model(model, required_models_names)
-            logging.info("models created succesfully")
+        logging.info("missing models are: %s", missing_models)
+        for model_name in missing_models:
+            create_model(model_name, models)
+            logging.info("model %s created succesfully", model_name)
 
 @app.route("/get_response", methods=["POST"])
 def get_response():
@@ -61,19 +67,20 @@ def get_response():
         if not user_prompt:
             return jsonify({"error": "Invalid input"})
 
-        # Format the prompt for LLM request
-        llm_request = {"stream": "false", "model": "sql-model", "prompt": user_prompt}
+        # Format the prompt for LLM request. `stream` must be a real boolean:
+        # a string makes Ollama reject the request, and leaving it out makes it
+        # reply with a stream of JSON objects that response.json() cannot parse.
+        llm_request = {"stream": False, "model": "sql-model", "prompt": user_prompt}
 
         # Make an HTTP request to LLM API
-        logging.info("request to LLM is: %s", llm_request)
+        logging.info("request to LLM is: %s", json.dumps(llm_request))
         response = requests.post(f"{LLM_API_URL}/generate", json=llm_request, timeout=120)
-        logging.info("Full request: %s", json.dumps(llm_request))
         response.raise_for_status()
-        logging.info("LLM reponse is: %s", response.raw)
         llm_response = response.json()
-        
-        # Extract response text and return
-        response_text = llm_response.get("text")
+        logging.info("LLM reponse is: %s", llm_response)
+
+        # Extract response text and return. Ollama returns it under "response".
+        response_text = llm_response.get("response")
         if response_text:
             return jsonify({"response": response_text})
         else:
